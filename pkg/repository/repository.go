@@ -13,10 +13,18 @@ type Authorization interface {
 	Client(login, password string) (internal_types.Client, error)
 	Manager(login, password string) (internal_types.Manager, error)
 }
+
+type Manager interface {
+	Delete(managerId int) error
+}
 type Repository struct {
 	Authorization
+	Manager
 }
 
 func NewRepository(db *sqlx.DB) *Repository {
-	return &Repository{Authorization: postgres.NewAuthPostgres(db)}
+	return &Repository{
+		Authorization: postgres.NewAuthPostgres(db),
+		Manager:       postgres.NewManagerPostgres(db),
+	}
 }

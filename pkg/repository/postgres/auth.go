@@ -1,9 +1,19 @@
 package postgres
 
 import (
+	"errors"
 	"fmt"
 	internal_types "fund-management-information-system/internal-types"
 	"github.com/jmoiron/sqlx"
+)
+
+const (
+	clientsTable  = "clients"
+	managersTable = "managers"
+)
+const (
+	loginExistErr = "Логин уже занят"
+	phoneExistErr = "Номер телефона уже занят"
 )
 
 type AuthPostgres struct {
@@ -32,9 +42,15 @@ func (r *AuthPostgres) CreateClient(client internal_types.Client) (int, error) {
 }
 
 func (r *AuthPostgres) CreateManager(manager internal_types.Manager) (int, error) {
-	var id int
-	query := fmt.Sprintf("INSERT INTO managers (Name, Surname, Address, Email, Phone, Login, PasswordHash) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING Id")
+	if loginExist(managersTable, manager.Login, r.db) {
+		return 0, errors.New(loginExistErr)
+	}
+	if phoneExist(managersTable, manager.Phone, r.db) {
+		return 0, errors.New(phoneExistErr)
+	}
 
+	var id int
+	query := fmt.Sprintf("INSERT INTO %s (Name, Surname, Address, Email, Phone, Login, PasswordHash) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING Id", managersTable)
 	row := r.db.QueryRow(query, manager.Name, manager.Surname, manager.Address, manager.Email, manager.Phone, manager.Login, manager.Password)
 	if err := row.Scan(&id); err != nil {
 		return 0, err
@@ -67,4 +83,19 @@ func (r *AuthPostgres) User(login, password string) (User, error) {
 	err := r.db.Get(&user, query, login, password)
 
 	return user, err
+}
+
+func loginExist(table, login string, db *sqlx.DB) bool {
+	var exist bool
+	query := fmt.Sprintf("SELECT EXISTS(SELECT 1 FROM %s WHERE login=$1)", table)
+	row := db.QueryRow(query, login)
+	_ = row.Scan(&exist)
+	return exist
+}
+func phoneExist(table, phone string, db *sqlx.DB) bool {
+	var exist bool
+	query := fmt.Sprintf("SELECT EXISTS(SELECT 1 FROM %s WHERE phone=$1)", table)
+	row := db.QueryRow(query, phone)
+	_ = row.Scan(&exist)
+	return exist
 }

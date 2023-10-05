@@ -5,10 +5,6 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-const (
-	clientsTable = "clients"
-)
-
 type Config struct {
 	Host     string
 	Port     string

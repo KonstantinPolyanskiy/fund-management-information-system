@@ -12,12 +12,17 @@ type Authorization interface {
 	ParseToken(token string) (int, error)
 }
 
+type Manager interface {
+	Delete(managerId int) error
+}
 type Service struct {
 	Authorization
+	Manager
 }
 
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
 		Authorization: NewAuthService(repos.Authorization),
+		Manager:       NewManagerService(repos.Manager),
 	}
 }

@@ -2,11 +2,11 @@ package internal_types
 
 type Manager struct {
 	Id       int    `db:"Id"`
-	Name     string `json:"name"`
-	Surname  string `json:"surname"`
+	Name     string `json:"name" binding:"required"`
+	Surname  string `json:"surname" binding:"required"`
 	Address  string `json:"address"`
 	Email    string `json:"email"`
-	Phone    string `json:"phone"`
-	Login    string `json:"login"`
-	Password string `json:"password"`
+	Phone    string `json:"phone" binding:"required"`
+	Login    string `json:"login" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }
