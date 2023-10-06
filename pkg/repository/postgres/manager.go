@@ -14,7 +14,7 @@ func NewManagerPostgres(db *sqlx.DB) *ManagerRepositoryPostgres {
 }
 
 func (r *ManagerRepositoryPostgres) Delete(managerId int) error {
-	query := fmt.Sprintf("DELETE FROM managers WHERE id=$1")
+	query := fmt.Sprintf("DELETE FROM %s WHERE Id=$1", managersTable)
 	_, err := r.db.Exec(query, managerId)
 	return err
 }

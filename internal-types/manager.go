@@ -1,7 +1,7 @@
 package internal_types
 
 type Manager struct {
-	Id       int    `db:"Id"`
+	Id       int    `json:"-" db:"Id"`
 	Name     string `json:"name" binding:"required"`
 	Surname  string `json:"surname" binding:"required"`
 	Address  string `json:"address"`

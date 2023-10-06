@@ -22,7 +22,8 @@ type AuthService struct {
 
 type TokenClaims struct {
 	jwt.StandardClaims
-	UserId int `json:"user_id"`
+	UserId int    `json:"user_id"`
+	Role   string `json:"role"`
 }
 
 func NewAuthService(repo repository.Authorization) *AuthService {
@@ -30,8 +31,10 @@ func NewAuthService(repo repository.Authorization) *AuthService {
 }
 
 func (s *AuthService) CreateClient(client internal_types.Client) (int, error) {
-	if err := checkValidEmail(client.Email); err != nil {
-		return 0, err
+	if client.Email != "" {
+		if err := checkValidEmail(client.Email); err != nil {
+			return 0, err
+		}
 	}
 	client.Password = generatePasswordHash(client.Password)
 	return s.repo.CreateClient(client)
@@ -48,7 +51,7 @@ func (s *AuthService) CreateManager(manager internal_types.Manager) (int, error)
 }
 
 func (s *AuthService) GenerateToken(login, password string) (string, error) {
-	user, err := s.repo.User(login, generatePasswordHash(password))
+	user, role, err := s.repo.User(login, generatePasswordHash(password))
 	if err != nil {
 		return "", err
 	}
@@ -59,6 +62,7 @@ func (s *AuthService) GenerateToken(login, password string) (string, error) {
 			IssuedAt:  time.Now().Unix(),
 		},
 		user.Id,
+		role,
 	})
 
 	return token.SignedString([]byte(signingKey))
@@ -81,6 +85,13 @@ func (s *AuthService) ParseToken(accessToken string) (int, error) {
 	}
 
 	return claims.UserId, nil
+}
+func (s *AuthService) Role(login, password string) (string, error) {
+	_, role, err := s.repo.User(login, generatePasswordHash(password))
+	if err != nil {
+		return "", err
+	}
+	return role, nil
 }
 
 func generatePasswordHash(password string) string {
