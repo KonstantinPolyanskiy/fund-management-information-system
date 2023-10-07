@@ -4,10 +4,13 @@ import (
 	"errors"
 	"fmt"
 	internal_types "fund-management-information-system/internal_types"
+	"fund-management-information-system/pkg/repository/utils"
 	"github.com/jmoiron/sqlx"
 )
 
 const (
+	accountsTable = "accounts"
+	personsTable  = "persons"
 	clientsTable  = "clients"
 	managersTable = "managers"
 )
@@ -60,12 +63,14 @@ func (r *AuthPostgres) CreateManager(manager internal_types.SignUp) (int, error)
 	    (login, password_hash) 
 	VALUES 
 	    ($1, $2)
+	RETURNING id
 	`
 	addPersonEmailQuery := `	
 	INSERT INTO persons
 	    (email)
 	VALUES 
 	    ($1)
+	RETURNING id
 	`
 	addManagerQuery := `
 	INSERT INTO managers
@@ -75,33 +80,37 @@ func (r *AuthPostgres) CreateManager(manager internal_types.SignUp) (int, error)
 	RETURNING id
 	`
 
-	getAccountIdQuery := `
-	SELECT id FROM accounts
-	WHERE login=$1
-	`
-	getPersonIdQuery := `
-	SELECT id FROM persons
-	WHERE email=$1
-	`
-
-	row := r.db.QueryRow(addAccountQuery, manager.Login, manager.Password) // вносим в таблицу accounts
-	row = r.db.QueryRow(getAccountIdQuery, manager.Login)                  // получаем id созданной записи accounts
-	if err := row.Scan(&accountId); err != nil {
+	tx, err := r.db.Begin()
+	if err != nil {
 		return 0, err
 	}
 
-	row = r.db.QueryRow(addPersonEmailQuery, manager.Email)
-	row = r.db.QueryRow(getPersonIdQuery, manager.Email)
-	if err := row.Scan(&personId); err != nil {
+	if err := utils.LoginBusy(manager.Login, r.db); err != nil {
+		return 0, err
+	}
+	if err := utils.EmailBusy(manager.Email, r.db); err != nil {
 		return 0, err
 	}
 
-	row = r.db.QueryRow(addManagerQuery, accountId, personId)
-	if err := row.Scan(&managerId); err != nil {
+	err = r.db.QueryRow(addAccountQuery, manager.Login, manager.Password).Scan(&accountId)
+	if err != nil {
+		tx.Rollback()
 		return 0, err
 	}
 
-	return managerId, nil
+	err = r.db.QueryRow(addPersonEmailQuery, manager.Email).Scan(&personId)
+	if err != nil {
+		tx.Rollback()
+		return 0, err
+	}
+
+	err = r.db.QueryRow(addManagerQuery, accountId, personId).Scan(&managerId)
+	if err != nil {
+		tx.Rollback()
+		return 0, err
+	}
+
+	return managerId, tx.Commit()
 }
 
 func (r *AuthPostgres) Manager(login, password string) (internal_types.Manager, error) {
