@@ -4,7 +4,7 @@ import (
 	"crypto/sha1"
 	"errors"
 	"fmt"
-	internal_types "fund-management-information-system/internal-types"
+	internal_types "fund-management-information-system/internal_types"
 	"fund-management-information-system/pkg/repository"
 	"github.com/dgrijalva/jwt-go"
 	"strings"
@@ -40,7 +40,7 @@ func (s *AuthService) CreateClient(client internal_types.Client) (int, error) {
 	return s.repo.CreateClient(client)
 }
 
-func (s *AuthService) CreateManager(manager internal_types.Manager) (int, error) {
+func (s *AuthService) CreateManager(manager internal_types.SignUp) (int, error) {
 	if manager.Email != "" {
 		if err := checkValidEmail(manager.Email); err != nil {
 			return 0, err

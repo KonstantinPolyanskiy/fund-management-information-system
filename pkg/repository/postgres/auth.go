@@ -3,7 +3,7 @@ package postgres
 import (
 	"errors"
 	"fmt"
-	internal_types "fund-management-information-system/internal-types"
+	internal_types "fund-management-information-system/internal_types"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -52,21 +52,56 @@ func (r *AuthPostgres) CreateClient(client internal_types.Client) (int, error) {
 	return id, nil
 }
 
-func (r *AuthPostgres) CreateManager(manager internal_types.Manager) (int, error) {
-	if loginExist(managersTable, manager.Login, r.db) {
-		return 0, errors.New(loginExistErr)
-	}
-	if phoneExist(managersTable, manager.Phone, r.db) {
-		return 0, errors.New(phoneExistErr)
-	}
+func (r *AuthPostgres) CreateManager(manager internal_types.SignUp) (int, error) {
+	var accountId, personId, managerId int
 
-	var id int
-	query := fmt.Sprintf("INSERT INTO %s (Name, Surname, Address, Email, Phone, Login, PasswordHash) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING Id", managersTable)
-	row := r.db.QueryRow(query, manager.Name, manager.Surname, manager.Address, manager.Email, manager.Phone, manager.Login, manager.Password)
-	if err := row.Scan(&id); err != nil {
+	addAccountQuery := `
+	INSERT INTO accounts
+	    (login, password_hash) 
+	VALUES 
+	    ($1, $2)
+	`
+	addPersonEmailQuery := `	
+	INSERT INTO persons
+	    (email)
+	VALUES 
+	    ($1)
+	`
+	addManagerQuery := `
+	INSERT INTO managers
+	    (account_id, person_id)
+	VALUES 
+	    ($1, $2)
+	RETURNING id
+	`
+
+	getAccountIdQuery := `
+	SELECT id FROM accounts
+	WHERE login=$1
+	`
+	getPersonIdQuery := `
+	SELECT id FROM persons
+	WHERE email=$1
+	`
+
+	row := r.db.QueryRow(addAccountQuery, manager.Login, manager.Password) // вносим в таблицу accounts
+	row = r.db.QueryRow(getAccountIdQuery, manager.Login)                  // получаем id созданной записи accounts
+	if err := row.Scan(&accountId); err != nil {
 		return 0, err
 	}
-	return id, nil
+
+	row = r.db.QueryRow(addPersonEmailQuery, manager.Email)
+	row = r.db.QueryRow(getPersonIdQuery, manager.Email)
+	if err := row.Scan(&personId); err != nil {
+		return 0, err
+	}
+
+	row = r.db.QueryRow(addManagerQuery, accountId, personId)
+	if err := row.Scan(&managerId); err != nil {
+		return 0, err
+	}
+
+	return managerId, nil
 }
 
 func (r *AuthPostgres) Manager(login, password string) (internal_types.Manager, error) {

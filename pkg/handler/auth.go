@@ -1,7 +1,7 @@
 package handler
 
 import (
-	internal_types "fund-management-information-system/internal-types"
+	internal_types "fund-management-information-system/internal_types"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -31,7 +31,7 @@ func (h *Handler) signUpClient(ctx *gin.Context) {
 }
 
 func (h *Handler) signUpManager(ctx *gin.Context) {
-	var input internal_types.Manager
+	var input internal_types.SignUp
 
 	if err := ctx.BindJSON(&input); err != nil {
 		newErrorResponse(ctx, http.StatusBadRequest, "некорректный ввод")
