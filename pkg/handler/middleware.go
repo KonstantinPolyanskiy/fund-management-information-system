@@ -4,9 +4,20 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
+func (h *Handler) idValidator(ctx *gin.Context) {
+	id := ctx.Param("id")
+	intId, err := strconv.Atoi(id)
+	if err != nil {
+		newErrorResponse(ctx, http.StatusBadRequest, "невалидный id")
+	}
+	if intId == 0 {
+		newErrorResponse(ctx, http.StatusBadRequest, "невалидный id")
+	}
+}
 func (h *Handler) userIdentity(ctx *gin.Context) {
 	header := ctx.GetHeader("Authorization")
 	if header == "" {

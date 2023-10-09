@@ -26,10 +26,11 @@ const (
 type AuthPostgres struct {
 	db *sqlx.DB
 }
+
 type User struct {
-	Id       int
-	Login    string
-	Password string
+	Id       int    `db:"id"`
+	Login    string `db:"login"`
+	Password string `db:"password_hash"`
 }
 
 func NewAuthPostgres(db *sqlx.DB) *AuthPostgres {
@@ -56,7 +57,7 @@ func (r *AuthPostgres) CreateClient(client internal_types.Client) (int, error) {
 }
 
 func (r *AuthPostgres) CreateManager(manager internal_types.SignUp) (int, error) {
-	var accountId, personId, managerId int
+	var accountId, personId, workInfoId, managerId int
 
 	addAccountQuery := `
 	INSERT INTO accounts
@@ -67,16 +68,23 @@ func (r *AuthPostgres) CreateManager(manager internal_types.SignUp) (int, error)
 	`
 	addPersonEmailQuery := `	
 	INSERT INTO persons
-	    (email)
+	    (email, phone, address)
 	VALUES 
-	    ($1)
+	    ($1, '', '')
 	RETURNING id
 	`
+	addWorkInfoQuery := `
+	INSERT INTO manager_work_info
+		(bank_account, capital_managment, profit_percent_day) 
+	VALUES
+		('', 0, 0.0) 
+	RETURNING id
+`
 	addManagerQuery := `
 	INSERT INTO managers
-	    (account_id, person_id)
+	    (account_id, person_id, work_info_id)
 	VALUES 
-	    ($1, $2)
+	    ($1, $2, $3)
 	RETURNING id
 	`
 
@@ -94,25 +102,62 @@ func (r *AuthPostgres) CreateManager(manager internal_types.SignUp) (int, error)
 
 	err = r.db.QueryRow(addAccountQuery, manager.Login, manager.Password).Scan(&accountId)
 	if err != nil {
-		tx.Rollback()
+		err := tx.Rollback()
+		if err != nil {
+			return 0, err
+		}
 		return 0, err
 	}
 
 	err = r.db.QueryRow(addPersonEmailQuery, manager.Email).Scan(&personId)
 	if err != nil {
-		tx.Rollback()
+		err := tx.Rollback()
+		if err != nil {
+			return 0, err
+		}
 		return 0, err
 	}
 
-	err = r.db.QueryRow(addManagerQuery, accountId, personId).Scan(&managerId)
+	err = r.db.QueryRow(addWorkInfoQuery).Scan(&workInfoId)
 	if err != nil {
-		tx.Rollback()
+		err := tx.Rollback()
+		if err != nil {
+			return 0, err
+		}
 		return 0, err
 	}
 
+	err = r.db.QueryRow(addManagerQuery, accountId, personId, workInfoId).Scan(&managerId)
+	if err != nil {
+		err := tx.Rollback()
+		if err != nil {
+			return 0, err
+		}
+		return 0, err
+	}
+
+	if managerId == 0 {
+		err := tx.Rollback()
+		if err != nil {
+			return 0, err
+		}
+		return 0, errors.New("Ошибка в создании пользователя")
+	}
 	return managerId, tx.Commit()
 }
+func (r *AuthPostgres) GetUser(login, password string) (User, error) {
+	var user User
 
+	query := `
+	SELECT managers.id, login, password_hash
+	FROM managers
+	JOIN accounts ON managers.account_id = accounts.id
+	WHERE accounts.login=$1 AND accounts.password_hash=$2
+`
+
+	err := r.db.Get(&user, query, login, password)
+	return user, err
+}
 func (r *AuthPostgres) Manager(login, password string) (internal_types.Manager, error) {
 	var manager internal_types.Manager
 
@@ -131,19 +176,18 @@ func (r *AuthPostgres) Client(login, password string) (internal_types.Client, er
 	return client, err
 }
 
-func (r *AuthPostgres) User(login, password string) (User, string, error) {
+func (r *AuthPostgres) User(login, password string) (User, error) {
 	var user User
-	var role string
-
-	if isManager(login, password, r.db) {
-		role = roleManager
-	} else if isClient(login, password, r.db) {
-		role = roleClient
-	}
+	_ = `
+	SELECT m.id 	
+	FROM managers m 
+	JOIN accounts a ON a.id = m.account_id
+	WHERE a.login=$1 AND a.password_hash=$2
+`
 	query := fmt.Sprintf("SELECT Id FROM managers WHERE login=$1 AND passwordhash=$2 UNION SELECT Id FROM clients WHERE login=$1 AND passwordhash=$2")
 	err := r.db.Get(&user, query, login, password)
 
-	return user, role, err
+	return user, err
 }
 
 func loginExist(table, login string, db *sqlx.DB) bool {

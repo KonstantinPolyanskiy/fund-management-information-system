@@ -1,12 +1,12 @@
 package internal_types
 
+import "github.com/shopspring/decimal"
+
 type Manager struct {
-	Id       int    `json:"-" db:"Id"`
-	Name     string `json:"name" binding:"required"`
-	Surname  string `json:"surname" binding:"required"`
-	Address  string `json:"address"`
-	Email    string `json:"email"`
-	Phone    string `json:"phone" binding:"required"`
-	Login    string `json:"login" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	Email            string          `json:"email" db:"email"`
+	Phone            string          `json:"phone" db:"phone"`
+	Address          string          `json:"address" db:"address"`
+	BankAccount      string          `json:"bankAccount" db:"bank_account"`
+	CapitalManagment decimal.Decimal `json:"capitalManagment" db:"capital_managment"`
+	ProfitPercentDay float64         `json:"profitPercentDay" db:"profit_percent_day"`
 }

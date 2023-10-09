@@ -22,8 +22,7 @@ type AuthService struct {
 
 type TokenClaims struct {
 	jwt.StandardClaims
-	UserId int    `json:"user_id"`
-	Role   string `json:"role"`
+	UserId int `json:"user_id"`
 }
 
 func NewAuthService(repo repository.Authorization) *AuthService {
@@ -51,7 +50,7 @@ func (s *AuthService) CreateManager(manager internal_types.SignUp) (int, error) 
 }
 
 func (s *AuthService) GenerateToken(login, password string) (string, error) {
-	user, role, err := s.repo.User(login, generatePasswordHash(password))
+	user, err := s.repo.GetUser(login, generatePasswordHash(password))
 	if err != nil {
 		return "", err
 	}
@@ -62,7 +61,6 @@ func (s *AuthService) GenerateToken(login, password string) (string, error) {
 			IssuedAt:  time.Now().Unix(),
 		},
 		user.Id,
-		role,
 	})
 
 	return token.SignedString([]byte(signingKey))
@@ -85,13 +83,6 @@ func (s *AuthService) ParseToken(accessToken string) (int, error) {
 	}
 
 	return claims.UserId, nil
-}
-func (s *AuthService) Role(login, password string) (string, error) {
-	_, role, err := s.repo.User(login, generatePasswordHash(password))
-	if err != nil {
-		return "", err
-	}
-	return role, nil
 }
 
 func generatePasswordHash(password string) string {

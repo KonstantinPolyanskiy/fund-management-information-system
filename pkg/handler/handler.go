@@ -26,7 +26,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	{
 		managers := api.Group("/managers")
 		{
-			managers.DELETE("/:id", h.deleteManager)
+			managers.GET("/:id", h.getById, h.idValidator)
+			managers.DELETE("/:id", h.deleteManager, h.idValidator)
 		}
 	}
 

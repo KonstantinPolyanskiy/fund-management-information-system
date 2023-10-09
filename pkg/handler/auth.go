@@ -56,11 +56,7 @@ func (h *Handler) signIn(ctx *gin.Context) {
 		newErrorResponse(ctx, http.StatusBadRequest, "некорректные данные авторизации")
 		return
 	}
-	role, err := h.service.Role(input.Login, input.Password)
-	if err != nil {
-		newErrorResponse(ctx, http.StatusBadRequest, err.Error())
-		return
-	}
+
 	token, err := h.service.Authorization.GenerateToken(input.Login, input.Password)
 	if err != nil {
 		newErrorResponse(ctx, http.StatusInternalServerError, err.Error())
@@ -69,6 +65,5 @@ func (h *Handler) signIn(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, map[string]interface{}{
 		"token": token,
-		"role":  role,
 	})
 }

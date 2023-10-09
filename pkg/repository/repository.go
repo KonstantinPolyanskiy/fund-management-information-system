@@ -9,13 +9,14 @@ import (
 type Authorization interface {
 	CreateClient(client internal_types.Client) (int, error)
 	CreateManager(manager internal_types.SignUp) (int, error)
-	User(login, password string) (postgres.User, string, error)
+	GetUser(login, password string) (postgres.User, error)
 	Client(login, password string) (internal_types.Client, error)
 	Manager(login, password string) (internal_types.Manager, error)
 }
 
 type Manager interface {
-	Delete(managerId int) error
+	DeleteById(managerId int) error
+	GetById(managerId int) (internal_types.Manager, error)
 }
 type Client interface {
 	Delete(clientId int) error

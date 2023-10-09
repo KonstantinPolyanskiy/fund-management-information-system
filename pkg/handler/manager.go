@@ -12,7 +12,7 @@ func (h *Handler) deleteManager(ctx *gin.Context) {
 		newErrorResponse(ctx, http.StatusBadRequest, "невалидный id")
 		return
 	}
-	err = h.service.Manager.Delete(id)
+	err = h.service.Manager.DeleteById(id)
 	if err != nil {
 		newErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return
@@ -21,4 +21,19 @@ func (h *Handler) deleteManager(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, statusResponse{
 		Status: "ok",
 	})
+}
+
+func (h *Handler) getById(ctx *gin.Context) {
+	id, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		newErrorResponse(ctx, http.StatusBadRequest, "невалидный id")
+		return
+	}
+	manager, err := h.service.Manager.GetById(id)
+	if err != nil {
+		newErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	ctx.JSON(http.StatusOK, manager)
 }

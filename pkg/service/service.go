@@ -8,13 +8,13 @@ import (
 type Authorization interface {
 	CreateClient(client internal_types.Client) (int, error)
 	CreateManager(manager internal_types.SignUp) (int, error)
-	Role(login, password string) (string, error)
 	GenerateToken(login, password string) (string, error)
 	ParseToken(token string) (int, error)
 }
 
 type Manager interface {
-	Delete(managerId int) error
+	DeleteById(managerId int) error
+	GetById(managerId int) (internal_types.Manager, error)
 }
 type Client interface {
 	Delete(clientId int) error
