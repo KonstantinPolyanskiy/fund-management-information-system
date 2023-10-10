@@ -8,8 +8,8 @@ import (
 
 type Authorization interface {
 	CreateClient(client internal_types.SignUpClient) (int, error)
-	CreateManager(manager internal_types.SignUpManager) (int, error)
-	GetUser(login, password string) (postgres.User, error)
+	CreateManagerAccount(manager internal_types.ManagerAccount) (int, error)
+	GetAccount(login, password string) (postgres.Account, error)
 }
 
 type Manager interface {

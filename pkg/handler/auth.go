@@ -31,14 +31,14 @@ func (h *Handler) signUpClient(ctx *gin.Context) {
 }
 
 func (h *Handler) signUpManager(ctx *gin.Context) {
-	var input internal_types.SignUpManager
+	var input internal_types.ManagerAccount
 
 	if err := ctx.BindJSON(&input); err != nil {
 		newErrorResponse(ctx, http.StatusBadRequest, "некорректный ввод")
 		return
 	}
 
-	id, err := h.service.Authorization.CreateManager(input)
+	id, err := h.service.Authorization.CreateManagerAccount(input)
 	if err != nil {
 		newErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return

@@ -24,14 +24,14 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	}
 	api := router.Group("/api", h.userIdentity)
 	{
-		managers := api.Group("/managers")
+		managers := api.Group("/managers", h.idValidator)
 		{
-			managers.GET("/:id", h.getManagerById, h.idValidator)
-			managers.DELETE("/:id", h.deleteManager, h.idValidator)
+			managers.GET("/:id", h.getManagerById)
+			managers.DELETE("/:id", h.deleteManager)
 		}
-		clients := api.Group("/clients")
+		clients := api.Group("/clients", h.idValidator)
 		{
-			clients.DELETE(":id", h.deleteClient, h.idValidator)
+			clients.DELETE(":id", h.deleteClient)
 		}
 	}
 

@@ -7,7 +7,7 @@ import (
 
 type Authorization interface {
 	CreateClient(client internal_types.SignUpClient) (int, error)
-	CreateManager(manager internal_types.SignUpManager) (int, error)
+	CreateManagerAccount(manager internal_types.ManagerAccount) (int, error)
 	GenerateToken(login, password string) (string, error)
 	ParseToken(token string) (int, error)
 }

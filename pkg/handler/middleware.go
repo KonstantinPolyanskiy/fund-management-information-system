@@ -11,11 +11,9 @@ import (
 func (h *Handler) idValidator(ctx *gin.Context) {
 	id := ctx.Param("id")
 	intId, err := strconv.Atoi(id)
-	if err != nil {
+	if err != nil || intId == 0 {
 		newErrorResponse(ctx, http.StatusBadRequest, "невалидный id")
-	}
-	if intId == 0 {
-		newErrorResponse(ctx, http.StatusBadRequest, "невалидный id")
+		return
 	}
 }
 func (h *Handler) userIdentity(ctx *gin.Context) {

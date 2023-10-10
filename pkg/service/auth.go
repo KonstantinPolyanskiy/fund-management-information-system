@@ -39,18 +39,18 @@ func (s *AuthService) CreateClient(client internal_types.SignUpClient) (int, err
 	return s.repo.CreateClient(client)
 }
 
-func (s *AuthService) CreateManager(manager internal_types.SignUpManager) (int, error) {
-	if manager.Email != "" {
-		if err := checkValidEmail(manager.Email); err != nil {
+func (s *AuthService) CreateManagerAccount(managerAccount internal_types.ManagerAccount) (int, error) {
+	if managerAccount.Email != "" {
+		if err := checkValidEmail(managerAccount.Email); err != nil {
 			return 0, err
 		}
 	}
-	manager.Password = generatePasswordHash(manager.Password)
-	return s.repo.CreateManager(manager)
+	managerAccount.Password = generatePasswordHash(managerAccount.Password)
+	return s.repo.CreateManagerAccount(managerAccount)
 }
 
 func (s *AuthService) GenerateToken(login, password string) (string, error) {
-	user, err := s.repo.GetUser(login, generatePasswordHash(password))
+	account, err := s.repo.GetAccount(login, generatePasswordHash(password))
 	if err != nil {
 		return "", err
 	}
@@ -60,7 +60,7 @@ func (s *AuthService) GenerateToken(login, password string) (string, error) {
 			ExpiresAt: time.Now().Add(24 * time.Hour).Unix(),
 			IssuedAt:  time.Now().Unix(),
 		},
-		user.Id,
+		account.Id,
 	})
 
 	return token.SignedString([]byte(signingKey))

@@ -10,7 +10,7 @@ type AuthPostgres struct {
 	db *sqlx.DB
 }
 
-type User struct {
+type Account struct {
 	Id       int    `db:"id"`
 	Login    string `db:"login"`
 	Password string `db:"password_hash"`
@@ -87,7 +87,7 @@ func (r *AuthPostgres) CreateClient(client internal_types.SignUpClient) (int, er
 
 }
 
-func (r *AuthPostgres) CreateManager(manager internal_types.SignUpManager) (int, error) {
+func (r *AuthPostgres) CreateManagerAccount(manager internal_types.ManagerAccount) (int, error) {
 	var accountId, personId, workInfoId, managerId int
 
 	addAccountQuery := `
@@ -157,8 +157,8 @@ func (r *AuthPostgres) CreateManager(manager internal_types.SignUpManager) (int,
 	return managerId, tx.Commit()
 }
 
-func (r *AuthPostgres) GetUser(login, password string) (User, error) {
-	var user User
+func (r *AuthPostgres) GetAccount(login, password string) (Account, error) {
+	var user Account
 
 	query := `
 	SELECT id, login, password_hash
