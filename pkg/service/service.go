@@ -1,13 +1,13 @@
 package service
 
 import (
-	internal_types "fund-management-information-system/internal_types"
+	"fund-management-information-system/internal_types"
 	"fund-management-information-system/pkg/repository"
 )
 
 type Authorization interface {
-	CreateClient(client internal_types.Client) (int, error)
-	CreateManager(manager internal_types.SignUp) (int, error)
+	CreateClient(client internal_types.SignUpClient) (int, error)
+	CreateManager(manager internal_types.SignUpManager) (int, error)
 	GenerateToken(login, password string) (string, error)
 	ParseToken(token string) (int, error)
 }
@@ -17,7 +17,7 @@ type Manager interface {
 	GetById(managerId int) (internal_types.Manager, error)
 }
 type Client interface {
-	Delete(clientId int) error
+	DeleteById(clientId int) error
 }
 
 type Service struct {

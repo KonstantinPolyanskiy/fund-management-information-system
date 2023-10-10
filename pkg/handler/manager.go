@@ -23,7 +23,7 @@ func (h *Handler) deleteManager(ctx *gin.Context) {
 	})
 }
 
-func (h *Handler) getById(ctx *gin.Context) {
+func (h *Handler) getManagerById(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
 		newErrorResponse(ctx, http.StatusBadRequest, "невалидный id")

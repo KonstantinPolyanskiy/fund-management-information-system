@@ -9,5 +9,5 @@ type Client struct {
 	Phone     string `json:"phone" binding:"required"`
 	Login     string `json:"login" binding:"required"`
 	Password  string `json:"password" binding:"required"`
-	ManagerId *int   `json:"managerId,omitempty"`
+	ManagerId int    `json:"managerId,omitempty"`
 }

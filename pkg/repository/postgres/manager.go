@@ -13,17 +13,35 @@ func NewManagerPostgres(db *sqlx.DB) *ManagerRepositoryPostgres {
 	return &ManagerRepositoryPostgres{db: db}
 }
 
-// устарело
-/*func (r *ManagerRepositoryPostgres) Delete(managerId int) error {
-	query := fmt.Sprintf("DELETE FROM %s WHERE Id=$1", managersTable)
-	_, err := r.db.Exec(query, managerId)
-	return err
-}*/
 func (r *ManagerRepositoryPostgres) DeleteById(managerId int) error {
+	var accountId, workId, personId int
 	tx, err := r.db.Begin()
 	if err != nil {
 		return err
 	}
+	getAccountIdQuery := `
+	SELECT account_id
+	FROM managers
+	JOIN accounts ON managers.account_id = accounts.id
+	WHERE managers.id=$1
+`
+	getWorkIdQuery := `
+	SELECT work_info_id
+	FROM managers
+	JOIN manager_work_info ON managers.work_info_id = manager_work_info.id
+	WHERE managers.id=$1
+`
+	getPersonIdQuery := `
+	SELECT person_id
+	FROM managers 
+	JOIN persons on managers.person_id = persons.id
+	WHERE managers.id=$1
+`
+
+	deleteClientManagerQuery := `
+	DELETE FROM clients
+	WHERE manager_id=$1
+`
 	deleteWorkQuery := `
 	DELETE FROM manager_work_info
 	WHERE id=$1
@@ -39,12 +57,16 @@ func (r *ManagerRepositoryPostgres) DeleteById(managerId int) error {
 	deleteManagerQuery := `
 	DELETE FROM managers
 	WHERE id=$1
-	
 `
+	err = r.db.QueryRow(getAccountIdQuery, managerId).Scan(&accountId)
+	err = r.db.QueryRow(getWorkIdQuery, managerId).Scan(&workId)
+	err = r.db.QueryRow(getPersonIdQuery, managerId).Scan(&personId)
+
 	_, err = r.db.Exec(deleteManagerQuery, managerId)
-	_, err = r.db.Exec(deletePersonQuery, managerId)
-	_, err = r.db.Exec(deleteAccountQuery, managerId)
-	_, err = r.db.Exec(deleteWorkQuery, managerId)
+	_, err = r.db.Exec(deleteClientManagerQuery, managerId)
+	_, err = r.db.Exec(deletePersonQuery, personId)
+	_, err = r.db.Exec(deleteAccountQuery, accountId)
+	_, err = r.db.Exec(deleteWorkQuery, workId)
 
 	return tx.Commit()
 }

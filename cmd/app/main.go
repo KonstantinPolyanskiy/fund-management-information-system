@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	fund_management_information_system "fund-management-information-system"
 	"fund-management-information-system/pkg/handler"
 	"fund-management-information-system/pkg/repository"
@@ -9,6 +10,9 @@ import (
 	"github.com/gookit/slog"
 	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 func initConfig() error {
@@ -44,8 +48,25 @@ func main() {
 	handlers := handler.NewHandler(services)
 
 	srv := new(fund_management_information_system.Server)
-	if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
-		slog.Fatalf("Ошибка запуска сервера: %s", err.Error())
+
+	go func() {
+		if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
+			slog.Fatalf("ошибка в запуске сервера - %s", err.Error())
+		}
+	}()
+
+	slog.Println("Сервер запущен")
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
+	<-quit
+
+	slog.Println("Сервер завершил работу")
+
+	if err := srv.Shutdown(context.Background()); err != nil {
+		slog.Fatalf("ошибка в остановке сервера - %s", err.Error())
 	}
-	//slog.Println("Сервер запущен")
+	if err := db.Close(); err != nil {
+		slog.Fatalf("ошибка в остановке базы данных - %s", err.Error())
+	}
 }

@@ -12,7 +12,7 @@ type signInInput struct {
 }
 
 func (h *Handler) signUpClient(ctx *gin.Context) {
-	var input internal_types.Client
+	var input internal_types.SignUpClient
 
 	if err := ctx.BindJSON(&input); err != nil {
 		newErrorResponse(ctx, http.StatusBadRequest, "некорректный ввод")
@@ -31,7 +31,7 @@ func (h *Handler) signUpClient(ctx *gin.Context) {
 }
 
 func (h *Handler) signUpManager(ctx *gin.Context) {
-	var input internal_types.SignUp
+	var input internal_types.SignUpManager
 
 	if err := ctx.BindJSON(&input); err != nil {
 		newErrorResponse(ctx, http.StatusBadRequest, "некорректный ввод")

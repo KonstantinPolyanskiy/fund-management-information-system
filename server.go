@@ -1,6 +1,7 @@
 package fund_management_information_system
 
 import (
+	"context"
 	"net/http"
 	"time"
 )
@@ -20,4 +21,8 @@ func (s *Server) Run(port string, handler http.Handler) error {
 	}
 
 	return s.server.ListenAndServe()
+}
+
+func (s *Server) Shutdown(ctx context.Context) error {
+	return s.server.Shutdown(ctx)
 }

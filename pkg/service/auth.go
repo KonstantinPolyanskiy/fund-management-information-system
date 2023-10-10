@@ -29,7 +29,7 @@ func NewAuthService(repo repository.Authorization) *AuthService {
 	return &AuthService{repo: repo}
 }
 
-func (s *AuthService) CreateClient(client internal_types.Client) (int, error) {
+func (s *AuthService) CreateClient(client internal_types.SignUpClient) (int, error) {
 	if client.Email != "" {
 		if err := checkValidEmail(client.Email); err != nil {
 			return 0, err
@@ -39,7 +39,7 @@ func (s *AuthService) CreateClient(client internal_types.Client) (int, error) {
 	return s.repo.CreateClient(client)
 }
 
-func (s *AuthService) CreateManager(manager internal_types.SignUp) (int, error) {
+func (s *AuthService) CreateManager(manager internal_types.SignUpManager) (int, error) {
 	if manager.Email != "" {
 		if err := checkValidEmail(manager.Email); err != nil {
 			return 0, err
@@ -96,5 +96,5 @@ func checkValidEmail(email string) error {
 	if strings.Contains(email, "@mail.ru") {
 		return nil
 	}
-	return errors.New("Невалидная почта")
+	return errors.New("невалидная почта")
 }

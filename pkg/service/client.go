@@ -10,6 +10,6 @@ func NewClientService(repo repository.Client) *ClientService {
 	return &ClientService{repo: repo}
 }
 
-func (s *ClientService) Delete(clientId int) error {
-	return s.repo.Delete(clientId)
+func (s *ClientService) DeleteById(clientId int) error {
+	return s.repo.DeleteById(clientId)
 }

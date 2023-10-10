@@ -7,11 +7,9 @@ import (
 )
 
 type Authorization interface {
-	CreateClient(client internal_types.Client) (int, error)
-	CreateManager(manager internal_types.SignUp) (int, error)
+	CreateClient(client internal_types.SignUpClient) (int, error)
+	CreateManager(manager internal_types.SignUpManager) (int, error)
 	GetUser(login, password string) (postgres.User, error)
-	Client(login, password string) (internal_types.Client, error)
-	Manager(login, password string) (internal_types.Manager, error)
 }
 
 type Manager interface {
@@ -19,7 +17,7 @@ type Manager interface {
 	GetById(managerId int) (internal_types.Manager, error)
 }
 type Client interface {
-	Delete(clientId int) error
+	DeleteById(clientId int) error
 }
 type Repository struct {
 	Authorization
