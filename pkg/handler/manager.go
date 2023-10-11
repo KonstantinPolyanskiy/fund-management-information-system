@@ -37,3 +37,15 @@ func (h *Handler) getManagerById(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, manager)
 }
+
+func (h *Handler) updateManager(ctx *gin.Context) {
+
+}
+
+func getId(ctx *gin.Context, keyId string) (int, error) {
+	id, err := strconv.Atoi(ctx.Param(keyId))
+	if err != nil {
+		return 0, err
+	}
+	return id, nil
+}
