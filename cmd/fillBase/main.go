@@ -18,7 +18,7 @@ const (
 	RegRoute     string = "auth"
 	ManagerRoute string = "sign-up-manager"
 	ClientRoute  string = "sign-up-client"
-	CountEntity  int    = 50000
+	CountEntity  int    = 100
 )
 
 var charset []byte = []byte("abcdefghijklmnopqrstuvwxyz")
@@ -42,7 +42,7 @@ type (
 func main() {
 	var wg sync.WaitGroup
 
-	countWorkers := 1000
+	countWorkers := 5
 
 	wg.Add(countWorkers)
 

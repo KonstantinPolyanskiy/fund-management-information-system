@@ -1,13 +1,16 @@
 package handler
 
 import (
+	"fund-management-information-system/internal_types"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
 )
 
+const RequestParameterId = "id"
+
 func (h *Handler) deleteManager(ctx *gin.Context) {
-	id, err := strconv.Atoi(ctx.Param("id"))
+	id, err := getId(ctx, RequestParameterId)
 	if err != nil {
 		newErrorResponse(ctx, http.StatusBadRequest, "невалидный id")
 		return
@@ -24,7 +27,7 @@ func (h *Handler) deleteManager(ctx *gin.Context) {
 }
 
 func (h *Handler) getManagerById(ctx *gin.Context) {
-	id, err := strconv.Atoi(ctx.Param("id"))
+	id, err := getId(ctx, RequestParameterId)
 	if err != nil {
 		newErrorResponse(ctx, http.StatusBadRequest, "невалидный id")
 		return
@@ -39,7 +42,43 @@ func (h *Handler) getManagerById(ctx *gin.Context) {
 }
 
 func (h *Handler) updateManager(ctx *gin.Context) {
+	var wantManager, newManager internal_types.Manager
 
+	id, err := getId(ctx, RequestParameterId)
+	if err != nil {
+		newErrorResponse(ctx, http.StatusBadRequest, "невалидный id")
+		return
+	}
+
+	if err = ctx.BindJSON(&wantManager); err != nil {
+		newErrorResponse(ctx, http.StatusBadRequest, "невалидная структура")
+		return
+	}
+
+	newManager, err = h.service.Manager.UpdateManager(id, wantManager)
+	if err != nil {
+		newErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	ctx.JSON(http.StatusOK, newManager)
+}
+
+func (h *Handler) getManagers(ctx *gin.Context) {
+	from, err := strconv.Atoi(ctx.Query("from"))
+	if err != nil {
+		newErrorResponse(ctx, http.StatusBadRequest, "некорректное начальное значение")
+		return
+	}
+
+	if from <= 0 {
+		newErrorResponse(ctx, http.StatusBadRequest, "значение меньше или равно 0")
+		return
+	}
+
+	managers, err := h.service.Manager.GetManagers(from)
+
+	ctx.JSON(http.StatusOK, managers)
 }
 
 func getId(ctx *gin.Context, keyId string) (int, error) {

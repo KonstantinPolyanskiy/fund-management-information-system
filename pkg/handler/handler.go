@@ -15,7 +15,6 @@ func NewHandler(services *service.Service) *Handler {
 
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
-
 	auth := router.Group("/auth")
 	{
 		auth.POST("sign-up-client", h.signUpClient)
@@ -24,10 +23,12 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	}
 	api := router.Group("/api", h.userIdentity)
 	{
-		managers := api.Group("/managers", h.idValidator)
+		managers := api.Group("/managers")
 		{
-			managers.GET("/:id", h.getManagerById)
-			managers.DELETE("/:id", h.deleteManager)
+			managers.GET(":id", h.getManagerById, h.idValidator)
+			managers.GET("/group", h.getManagers)
+			managers.DELETE(":id", h.deleteManager, h.idValidator)
+			managers.PUT(":id", h.updateManager, h.idValidator)
 		}
 		clients := api.Group("/clients", h.idValidator)
 		{

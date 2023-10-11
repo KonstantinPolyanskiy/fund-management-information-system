@@ -10,3 +10,5 @@ type Manager struct {
 	CapitalManagment decimal.Decimal `json:"capitalManagment" db:"capital_managment"`
 	ProfitPercentDay float64         `json:"profitPercentDay" db:"profit_percent_day"`
 }
+
+type Managers []Manager

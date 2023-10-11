@@ -87,3 +87,28 @@ func (r *ManagerRepositoryPostgres) GetById(managerId int) (internal_types.Manag
 	}
 	return manager, nil
 }
+
+func (r *ManagerRepositoryPostgres) UpdateManager(id int, wantManager internal_types.Manager) error {
+	var err error
+	updatePersonQuery := `
+	UPDATE persons
+	SET email=$1, phone=$2, address=$3
+	WHERE id IN (SELECT person_id FROM managers WHERE id=$4)`
+
+	updateWorkInfoQuery := `
+	UPDATE manager_work_info
+	SET bank_account=$1, capital_managment=$2, profit_percent_day=$3
+	WHERE id IN (SELECT work_info_id FROM managers WHERE managers.id=$4)
+`
+
+	_, err = r.db.Exec(updatePersonQuery, wantManager.Email, wantManager.Phone, wantManager.Address, id)
+	if err != nil {
+		return err
+	}
+	_, err = r.db.Exec(updateWorkInfoQuery, wantManager.BankAccount, wantManager.CapitalManagment, wantManager.ProfitPercentDay, id)
+	if err != nil {
+		return err
+	}
+
+	return err
+}

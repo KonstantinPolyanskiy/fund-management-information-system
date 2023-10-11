@@ -15,6 +15,7 @@ type Authorization interface {
 type Manager interface {
 	DeleteById(managerId int) error
 	GetById(managerId int) (internal_types.Manager, error)
+	UpdateManager(id int, manager internal_types.Manager) error
 }
 type Client interface {
 	DeleteById(clientId int) error
