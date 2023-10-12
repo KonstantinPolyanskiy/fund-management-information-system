@@ -3,6 +3,7 @@ package internal_types
 import "github.com/shopspring/decimal"
 
 type Manager struct {
+	Id               int             `json:"id"`
 	Email            string          `json:"email" db:"email"`
 	Phone            string          `json:"phone" db:"phone"`
 	Address          string          `json:"address" db:"address"`

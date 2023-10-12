@@ -30,12 +30,21 @@ func (s *ManagerService) UpdateManager(id int, oldManager internal_types.Manager
 func (s *ManagerService) GetManagers(from int) (internal_types.Managers, error) {
 	managers := make(internal_types.Managers, CountRecords)
 
-	for i := from; i < CountRecords; i++ {
-		manager, err := s.repo.GetById(i)
+	idk := from
+
+	for i, _ := range managers {
+		if from > CountRecords+idk {
+			break
+		}
+		manager, err := s.GetById(from)
 		if err != nil {
 			return nil, err
 		}
+		if manager.Id == 0 {
+			break
+		}
 		managers[i] = manager
+		from++
 	}
 
 	return managers, nil

@@ -57,7 +57,6 @@ func main() {
 		work(managersData, client, uri)
 		defer wg.Done()
 	}()
-	defer TimeTrack(time.Now())
 	wg.Wait()
 
 	fmt.Printf("Работа закончена")
