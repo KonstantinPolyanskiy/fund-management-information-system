@@ -28,24 +28,32 @@ func (s *ManagerService) UpdateManager(id int, oldManager internal_types.Manager
 	return s.GetById(id)
 }
 func (s *ManagerService) GetManagers(from int) (internal_types.Managers, error) {
+	var count int
 	managers := make(internal_types.Managers, CountRecords)
 
-	idk := from
+	start := from
 
 	for i, _ := range managers {
-		if from > CountRecords+idk {
+		if from > CountRecords+start {
 			break
 		}
 		manager, err := s.GetById(from)
 		if err != nil {
-			return nil, err
+			break
 		}
 		if manager.Id == 0 {
 			break
 		}
 		managers[i] = manager
 		from++
+		count++
 	}
 
-	return managers, nil
+	managersResult := make(internal_types.Managers, count)
+
+	for i := 0; i < count; i++ {
+		managersResult[i] = managers[i]
+	}
+
+	return managersResult, nil
 }

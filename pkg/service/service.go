@@ -20,6 +20,7 @@ type Manager interface {
 }
 type Client interface {
 	DeleteById(clientId int) error
+	GetById(clientId int) (internal_types.Client, error)
 }
 
 type Service struct {

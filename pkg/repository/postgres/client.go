@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"fund-management-information-system/internal_types"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -110,4 +111,22 @@ func (r *ClientRepositoryPostgres) DeleteById(clientId int) error {
 
 	return nil
 
+}
+
+func (r *ClientRepositoryPostgres) GetById(clientId int) (internal_types.Client, error) {
+	var client internal_types.Client
+
+	query := `
+	SELECT client.id, person.email, person.phone, person.email,
+	       invest.bank_account, invest.investment_amount, invest.investment_strategy
+	FROM clients client
+	LEFT JOIN persons person ON client.id = person.id
+	LEFT JOIN client_investments_info invest ON client.id = invest.id
+	WHERE client.id=$1
+`
+	if err := r.db.Get(&client, query, clientId); err != nil {
+		return client, err
+	}
+
+	return client, nil
 }

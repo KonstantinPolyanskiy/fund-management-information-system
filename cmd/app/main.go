@@ -46,7 +46,6 @@ func main() {
 	repos := repository.NewRepository(db)
 	services := service.NewService(repos)
 	handlers := handler.NewHandler(services)
-
 	srv := new(fund_management_information_system.Server)
 
 	go func() {

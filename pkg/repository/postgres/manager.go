@@ -78,7 +78,7 @@ func (r *ManagerRepositoryPostgres) GetById(managerId int) (internal_types.Manag
 	SELECT mng.id, p.email, p.phone, p.address,
        mwi.bank_account, mwi.capital_managment, mwi.profit_percent_day
 	FROM managers mng
-	LEFT JOIN persons p ON mng.id = p.id
+	LEFT JOIN persons p ON mng.person_id = p.id
     LEFT JOIN manager_work_info mwi  ON mng.id = mwi.id
 	WHERE mng.id=$1`
 

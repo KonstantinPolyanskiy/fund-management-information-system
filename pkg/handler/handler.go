@@ -32,6 +32,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		}
 		clients := api.Group("/clients", h.idValidator)
 		{
+			clients.GET("/:id", h.getClientById, h.idValidator)
 			clients.DELETE(":id", h.deleteClient)
 		}
 	}

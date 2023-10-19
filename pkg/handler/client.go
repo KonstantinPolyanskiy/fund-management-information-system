@@ -23,3 +23,18 @@ func (h *Handler) deleteClient(ctx *gin.Context) {
 		Status: "ok",
 	})
 }
+func (h *Handler) getClientById(ctx *gin.Context) {
+	id, err := getId(ctx, RequestParameterId)
+	if err != nil {
+		newErrorResponse(ctx, http.StatusBadRequest, "невалидный id")
+		return
+	}
+
+	client, err := h.service.Client.GetById(id)
+	if err != nil {
+		newErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	ctx.JSON(http.StatusOK, client)
+}
