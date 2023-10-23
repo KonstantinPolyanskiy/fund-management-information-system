@@ -12,6 +12,7 @@ import (
 	"github.com/spf13/viper"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 )
 
@@ -22,14 +23,15 @@ func initConfig() error {
 	return viper.ReadInConfig()
 }
 func main() {
+	var wg sync.WaitGroup
 	slog.Configure(func(logger *slog.SugaredLogger) {
 		f := logger.Formatter.(*slog.TextFormatter)
 		f.EnableColor = true
 	})
 
-	if err := initConfig(); err != nil {
+	/*if err := initConfig(); err != nil {
 		slog.Fatalf("Ошибка инициализации конфига")
-	}
+	}*/
 	db, err := postgres.NewPostgresDB(postgres.Config{
 		Host:     "localhost",
 		Port:     "5436",
@@ -49,11 +51,13 @@ func main() {
 	srv := new(fund_management_information_system.Server)
 
 	go func() {
-		if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
+		if err := srv.Run("8080", handlers.InitRoutes()); err != nil {
 			slog.Fatalf("ошибка в запуске сервера - %s", err.Error())
 		}
 	}()
-
+	wg.Add(1)
+	go services.Manager.UpdateWorkInfo(context.Background())
+	wg.Done()
 	slog.Println("Сервер запущен")
 
 	quit := make(chan os.Signal, 1)

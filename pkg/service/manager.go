@@ -1,8 +1,12 @@
 package service
 
 import (
+	"context"
 	"fund-management-information-system/internal_types"
 	"fund-management-information-system/pkg/repository"
+	"github.com/shopspring/decimal"
+	"golang.org/x/exp/rand"
+	"time"
 )
 
 type ManagerService struct {
@@ -56,4 +60,39 @@ func (s *ManagerService) GetManagers(from int) (internal_types.Managers, error) 
 	}
 
 	return managersResult, nil
+}
+func (s *ManagerService) UpdateWorkInfo(ctx context.Context) {
+
+	var manager internal_types.Manager
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		default:
+			manager.CapitalManagment = capital()
+			manager.ProfitPercentDay = percent()
+
+			err := s.repo.UpdateWorkInfo(manager)
+			if err != nil {
+				ctx.Done()
+			}
+		}
+		time.Sleep(time.Millisecond)
+	}
+}
+
+func percent() float64 {
+	rand.Seed(uint64(time.Now().UnixNano()))
+	minPercent := 5.0
+	maxPercent := 10.0
+
+	return minPercent + rand.Float64()*(maxPercent-minPercent)
+}
+
+func capital() decimal.Decimal {
+	rand.Seed(uint64(time.Now().UnixNano()))
+	minCapital := decimal.NewFromFloat(10000)
+	maxCapital := decimal.NewFromFloat(1000000)
+
+	return minCapital.Add(maxCapital.Sub(minCapital).Mul(decimal.NewFromFloat(rand.Float64())))
 }

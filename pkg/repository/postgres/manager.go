@@ -112,3 +112,24 @@ func (r *ManagerRepositoryPostgres) UpdateManager(id int, wantManager internal_t
 
 	return err
 }
+
+func (r *ManagerRepositoryPostgres) UpdateWorkInfo(manager internal_types.Manager) error {
+	var err error
+
+	updateMWIQuery := `
+	UPDATE manager_work_info 
+	SET capital_managment = $1, profit_percent_day = $2
+	WHERE id = (
+	    SELECT id
+	    FROM manager_work_info
+	    ORDER BY random()
+	    LIMIT 1
+	)
+`
+	_, err = r.db.Exec(updateMWIQuery, manager.CapitalManagment, manager.ProfitPercentDay)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

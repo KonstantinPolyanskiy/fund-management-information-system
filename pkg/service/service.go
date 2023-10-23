@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"fund-management-information-system/internal_types"
 	"fund-management-information-system/pkg/repository"
 )
@@ -17,6 +18,7 @@ type Manager interface {
 	GetById(managerId int) (internal_types.Manager, error)
 	UpdateManager(id int, manager internal_types.Manager) (internal_types.Manager, error)
 	GetManagers(from int) (internal_types.Managers, error)
+	UpdateWorkInfo(ctx context.Context)
 }
 type Client interface {
 	DeleteById(clientId int) error
