@@ -22,6 +22,16 @@ func initConfig() error {
 
 	return viper.ReadInConfig()
 }
+
+// @title Invest fund management system
+// @version 1.0
+
+// @host localhost:8080
+// @BasePath /
+
+// @securityDefinitions.apiKey ApiKeyAuth
+// @in Header
+// @name Authorization
 func main() {
 	var wg sync.WaitGroup
 	slog.Configure(func(logger *slog.SugaredLogger) {

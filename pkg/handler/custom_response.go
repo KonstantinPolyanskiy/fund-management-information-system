@@ -14,9 +14,5 @@ type statusResponse struct {
 
 func newErrorResponse(ctx *gin.Context, statusCode int, message string) {
 	slog.Error(message)
-	ctx.JSON(statusCode,
-		gin.H{
-			"message": message,
-		})
-	ctx.AbortWithStatus(statusCode)
+	ctx.AbortWithStatusJSON(statusCode, errorResponse{Message: message})
 }

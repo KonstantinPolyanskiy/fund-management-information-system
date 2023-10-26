@@ -3,6 +3,8 @@ package handler
 import (
 	"fund-management-information-system/pkg/service"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type Handler struct {
@@ -38,6 +40,6 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			clients.PUT(":id", h.updateClient, h.idValidator)
 		}
 	}
-
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	return router
 }
