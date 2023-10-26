@@ -12,7 +12,50 @@ type ClientRepositoryPostgres struct {
 func NewClientPostgres(db *sqlx.DB) *ClientRepositoryPostgres {
 	return &ClientRepositoryPostgres{db: db}
 }
+func (r *ClientRepositoryPostgres) UpdateClient(id int, client internal_types.Client) error {
+	var err error
 
+	updateClientQuery := `
+	UPDATE persons
+	SET email=$1, phone=$2, address = $3
+	WHERE id IN (SELECT person_id FROM clients WHERE id=$4)
+`
+	updateInvestmentsQuery := `
+	UPDATE client_investments_info
+	SET bank_account=$1, investment_amount=$2, investment_strategy = $3
+	WHERE id IN (SELECT client_investments_info FROM clients WHERE clients.id=$4)
+`
+	_, err = r.db.Exec(updateClientQuery, client.Email, client.Phone, client.Address, id)
+	if err != nil {
+		return err
+	}
+
+	_, err = r.db.Exec(updateInvestmentsQuery, client.BankAccount, client.InvestmentAmount, client.InvestmentStrategy, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+func (r *ClientRepositoryPostgres) UpdateInvestments(client internal_types.Client) error {
+	var err error
+
+	updateCIIQuery := `
+	UPDATE client_investments_info
+	SET investment_amount=$1
+	WHERE id = (
+	    SELECT id
+	    FROM client_investments_info
+	    ORDER BY random()
+	    LIMIT 1
+	)
+`
+	_, err = r.db.Exec(updateCIIQuery, client.InvestmentAmount)
+	if err != nil {
+	}
+
+	return nil
+}
 func (r *ClientRepositoryPostgres) DeleteById(clientId int) error {
 	var managerId, accountId, InvestmentsId, personId int
 	var err error
@@ -112,7 +155,6 @@ func (r *ClientRepositoryPostgres) DeleteById(clientId int) error {
 	return nil
 
 }
-
 func (r *ClientRepositoryPostgres) GetById(clientId int) (internal_types.Client, error) {
 	var client internal_types.Client
 

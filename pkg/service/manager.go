@@ -22,6 +22,7 @@ func (s *ManagerService) GetById(managerId int) (internal_types.Manager, error) 
 	return s.repo.GetById(managerId)
 }
 func (s *ManagerService) DeleteById(managerId int) error {
+
 	return s.repo.DeleteById(managerId)
 }
 func (s *ManagerService) UpdateManager(id int, oldManager internal_types.Manager) (internal_types.Manager, error) {
@@ -43,7 +44,7 @@ func (s *ManagerService) GetManagers(from int) (internal_types.Managers, error) 
 		}
 		manager, err := s.GetById(from)
 		if err != nil {
-			break
+			return nil, err
 		}
 		if manager.Id == 0 {
 			break
@@ -61,9 +62,9 @@ func (s *ManagerService) GetManagers(from int) (internal_types.Managers, error) 
 
 	return managersResult, nil
 }
-func (s *ManagerService) UpdateWorkInfo(ctx context.Context) {
-
+func (s *ManagerService) UpdateWorkInfoProcess(ctx context.Context) {
 	var manager internal_types.Manager
+
 	for {
 		select {
 		case <-ctx.Done():

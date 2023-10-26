@@ -22,6 +22,8 @@ type Manager interface {
 type Client interface {
 	DeleteById(clientId int) error
 	GetById(clientId int) (internal_types.Client, error)
+	UpdateClient(id int, client internal_types.Client) error
+	UpdateInvestments(client internal_types.Client) error
 }
 type Repository struct {
 	Authorization

@@ -19,6 +19,7 @@ func (r *ManagerRepositoryPostgres) DeleteById(managerId int) error {
 	if err != nil {
 		return err
 	}
+
 	getAccountIdQuery := `
 	SELECT account_id
 	FROM managers
@@ -39,7 +40,8 @@ func (r *ManagerRepositoryPostgres) DeleteById(managerId int) error {
 `
 
 	deleteClientManagerQuery := `
-	DELETE FROM clients
+	UPDATE clients
+	SET id = null
 	WHERE manager_id=$1
 `
 	deleteWorkQuery := `
@@ -110,7 +112,7 @@ func (r *ManagerRepositoryPostgres) UpdateManager(id int, wantManager internal_t
 		return err
 	}
 
-	return err
+	return nil
 }
 
 func (r *ManagerRepositoryPostgres) UpdateWorkInfo(manager internal_types.Manager) error {

@@ -55,9 +55,12 @@ func main() {
 			slog.Fatalf("ошибка в запуске сервера - %s", err.Error())
 		}
 	}()
-	wg.Add(1)
-	go services.Manager.UpdateWorkInfo(context.Background())
+
+	wg.Add(2)
+	go services.Manager.UpdateWorkInfoProcess(context.Background())
+	go services.Client.UpdateInvestmentsInfoProcess(context.Background())
 	wg.Done()
+
 	slog.Println("Сервер запущен")
 
 	quit := make(chan os.Signal, 1)

@@ -42,7 +42,7 @@ func (h *Handler) getManagerById(ctx *gin.Context) {
 }
 
 func (h *Handler) updateManager(ctx *gin.Context) {
-	var wantManager, newManager internal_types.Manager
+	var wantManager, updatedManager internal_types.Manager
 
 	id, err := getId(ctx, RequestParameterId)
 	if err != nil {
@@ -55,13 +55,13 @@ func (h *Handler) updateManager(ctx *gin.Context) {
 		return
 	}
 
-	newManager, err = h.service.Manager.UpdateManager(id, wantManager)
+	updatedManager, err = h.service.Manager.UpdateManager(id, wantManager)
 	if err != nil {
 		newErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	ctx.JSON(http.StatusOK, newManager)
+	ctx.JSON(http.StatusOK, updatedManager)
 }
 
 func (h *Handler) getManagers(ctx *gin.Context) {

@@ -18,11 +18,14 @@ type Manager interface {
 	GetById(managerId int) (internal_types.Manager, error)
 	UpdateManager(id int, manager internal_types.Manager) (internal_types.Manager, error)
 	GetManagers(from int) (internal_types.Managers, error)
-	UpdateWorkInfo(ctx context.Context)
+	UpdateWorkInfoProcess(ctx context.Context)
 }
 type Client interface {
 	DeleteById(clientId int) error
 	GetById(clientId int) (internal_types.Client, error)
+	UpdateClient(id int, OldClient internal_types.Client) (internal_types.Client, error)
+	GetClients(from int) (internal_types.Clients, error)
+	UpdateInvestmentsInfoProcess(ctx context.Context)
 }
 
 type Service struct {
