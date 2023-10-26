@@ -1,0 +1,157 @@
+basePath: /
+definitions:
+  handler.errorResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  handler.signInInput:
+    properties:
+      login:
+        type: string
+      password:
+        type: string
+    required:
+    - login
+    - password
+    type: object
+  internal_types.SignUpClient:
+    properties:
+      email:
+        type: string
+      login:
+        type: string
+      managerId:
+        type: integer
+      password:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  title: Invest fund management system
+  version: "1.0"
+paths:
+  /auth/sign-in:
+    post:
+      consumes:
+      - application/json
+      description: Получение jwt токена
+      operationId: sign-in
+      parameters:
+      - description: Данные для авторизации
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handler.signInInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: token
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: SignIn
+      tags:
+      - auth
+  /auth/sign-up-client:
+    post:
+      consumes:
+      - application/json
+      description: Создание и регистрация клиента
+      operationId: create-client
+      parameters:
+      - description: Данные для создания клиента
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/internal_types.SignUpClient'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: SignUpClient
+      tags:
+      - auth
+  /auth/sign-up-manager:
+    post:
+      consumes:
+      - application/json
+      description: Создание и регистрация менеджера
+      operationId: create-manager
+      parameters:
+      - description: Данные для создания менеджера
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/internal_types.SignUpClient'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: SignUpManager
+      tags:
+      - auth
+securityDefinitions:
+  ApiKeyAuth:
+    in: Header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
