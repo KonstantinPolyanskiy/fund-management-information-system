@@ -15,6 +15,19 @@ definitions:
     - login
     - password
     type: object
+  internal_types.ManagerAccount:
+    properties:
+      email:
+        type: string
+      login:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - login
+    - password
+    type: object
   internal_types.SignUpClient:
     properties:
       email:
@@ -32,6 +45,46 @@ info:
   title: Invest fund management system
   version: "1.0"
 paths:
+  /api/clients/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Удаление клиента
+      operationId: delete-client
+      parameters:
+      - description: ID удаляемого клиента
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: DeleteClient
+      tags:
+      - client
   /auth/sign-in:
     post:
       consumes:
@@ -122,7 +175,7 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/internal_types.SignUpClient'
+          $ref: '#/definitions/internal_types.ManagerAccount'
       produces:
       - application/json
       responses:

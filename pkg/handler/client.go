@@ -7,6 +7,19 @@ import (
 	"strconv"
 )
 
+// @Summary		DeleteClient
+// @Tags			client
+// @Description	Удаление клиента
+// @Id				delete-client
+// @Accept			json
+// @Produce		json
+// @Param			id		path		int		true	"ID удаляемого клиента"
+// @Success		200		{string}	string	"ok"
+// @Failure		400,404	{object}	errorResponse
+// @Failure		500		{object}	errorResponse
+// @Failure		default	{object}	errorResponse
+// @Security		ApiKeyAuth
+// @Router			/api/clients/{id} [delete]
 func (h *Handler) deleteClient(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {

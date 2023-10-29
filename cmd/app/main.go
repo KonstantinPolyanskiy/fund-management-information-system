@@ -51,15 +51,15 @@ func applyMigrations(db *sqlx.DB) error {
 	return nil
 }
 
-// @title Invest fund management system
-// @version 1.0
+//	@title		Invest fund management system
+//	@version	1.0
 
-// @host localhost:8080
-// @BasePath /
+//	@host		localhost:8080
+//	@BasePath	/
 
-// @securityDefinitions.apiKey ApiKeyAuth
-// @in Header
-// @name Authorization
+// @securityDefinitions.apiKey	ApiKeyAuth
+// @in							Header
+// @name						Authorization
 func main() {
 	var wg sync.WaitGroup
 	slog.Configure(func(logger *slog.SugaredLogger) {
