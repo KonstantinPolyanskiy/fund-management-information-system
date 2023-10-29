@@ -4,6 +4,7 @@ import (
 	"context"
 	fund_management_information_system "fund-management-information-system"
 	_ "fund-management-information-system/docs"
+	"fund-management-information-system/internal"
 	"fund-management-information-system/pkg/handler"
 	"fund-management-information-system/pkg/repository"
 	"fund-management-information-system/pkg/repository/postgres"
@@ -92,16 +93,22 @@ func main() {
 	handlers := handler.NewHandler(services)
 	srv := new(fund_management_information_system.Server)
 
+	executor := internal.NewExecutorProcess(&wg)
+
 	go func() {
 		if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
 			slog.Fatalf("ошибка в запуске сервера - %s", err.Error())
 		}
 	}()
 
-	wg.Add(2)
-	go services.Manager.UpdateWorkInfoProcess(context.Background())
-	go services.Client.UpdateInvestmentsInfoProcess(context.Background())
-	wg.Done()
+	executor.
+		Add(func() {
+			services.Manager.UpdateWorkInfoProcess(executor.Ctx)
+		}).
+		Add(func() {
+			services.Client.UpdateInvestmentsInfoProcess(executor.Ctx)
+		}).
+		Exec()
 
 	slog.Println("Сервер запущен")
 
