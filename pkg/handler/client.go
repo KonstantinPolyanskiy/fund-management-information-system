@@ -37,6 +37,17 @@ func (h *Handler) deleteClient(ctx *gin.Context) {
 		Status: "ok",
 	})
 }
+
+// @Summary GetClient
+// @Tags client
+// @Description получение клиента по его id
+// @Id get-client
+// @Produce json
+// @Param id path int true "ID клиента, которого хочем получить"
+// @Success 200 {object} internal_types.Client
+// @Failure default {object} errorResponse
+// @Security ApiKeyAuth
+// @Router /api/clients/{id} [get]
 func (h *Handler) getClientById(ctx *gin.Context) {
 	id, err := getId(ctx, RequestParameterId)
 	if err != nil {

@@ -53,9 +53,9 @@ func main() {
 	managersData := fillManagers()
 
 	go func() {
+		defer wg.Done()
 		defer TimeTrack(time.Now())
 		work(managersData, client, uri)
-		defer wg.Done()
 	}()
 	wg.Wait()
 
@@ -78,13 +78,6 @@ func randomString(length int) string {
 	}
 
 	return string(b)
-}
-func printManagers(managers ManagersData) {
-	for i, manager := range managers {
-		fmt.Printf("%d  Login - %s \n", i, manager.Login)
-		fmt.Printf("   Password - %s \n", manager.Password)
-		fmt.Printf("   Email - %s \n", manager.Email)
-	}
 }
 func makeReqDataManager(manager ManagerRegistrationRequest) []byte {
 	rd, _ := json.Marshal(manager)
